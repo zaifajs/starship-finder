@@ -39,12 +39,12 @@
 				</span>
 			</div>
 
-			<span v-if="noResults" class="no-result no-bookmarked-item">
-				No results were found matching: {{ searchQuery }}
-			</span>
-
 			<!-- starships all item -->
 			<div class="list-wrapper">
+
+				<span v-if="openBookmarkedData && noResults" class="no-result no-bookmarked-item">
+					No results were found matching: {{ searchQuery }}
+				</span>
 
 				<CoListItem
 					v-for="(starship, starshipIndex) in filteredShips"
@@ -208,11 +208,7 @@ export default {
 			} */
 		},
 		noResults() {
-			if (this.searchQuery.length > 1 && this.filteredShips.length === 0) {
-				return true;
-			} else {
-				return false;
-			}
+			if (this.searchQuery.length > 1 || this.bookmarkedData.length === 0) { return true;} else { return false; }
 		},
 		// get bookmarked items lenght
 		bookmarkedLength() {

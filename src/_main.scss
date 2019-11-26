@@ -1,3 +1,12 @@
+@font-face {font-family: "DIN Next W01 Regular";
+src: url("https://db.onlinewebfonts.com/t/1daa609fdca8da38e5bcbb12c2a987db.eot"); /* IE9*/
+src: url("https://db.onlinewebfonts.com/t/1daa609fdca8da38e5bcbb12c2a987db.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+url("https://db.onlinewebfonts.com/t/1daa609fdca8da38e5bcbb12c2a987db.woff2") format("woff2"), /* chrome firefox */
+url("https://db.onlinewebfonts.com/t/1daa609fdca8da38e5bcbb12c2a987db.woff") format("woff"), /* chrome firefox */
+url("https://db.onlinewebfonts.com/t/1daa609fdca8da38e5bcbb12c2a987db.ttf") format("truetype"), /* chrome firefox opera Safari, Android, iOS 4.2+*/
+url("https://db.onlinewebfonts.com/t/1daa609fdca8da38e5bcbb12c2a987db.svg#DIN Next W01 Regular") format("svg"); /* iOS 4.1- */
+}
+
 @import './styles/utils';
 @import './styles/variables';
 
@@ -14,6 +23,7 @@ body, h1, h2, h3, h4, h5, h6, p, ol, ul {
 	margin: 0;
 	padding: 0;
 	font-weight: normal;
+	font-family: 'DIN Next W01 Regular', Helvetica, sans-serif;
 }
 
 ol, ul {

@@ -119,7 +119,7 @@ export default {
 				.then((response) => {
 					if (response.data.next || response.data.previous) {
 						if (response.data.next !== null) {
-							this.loadStarships(response.data.next);
+							this.loadStarships(response.data.next.replace(/^http:\/\//i, 'https://'));
 						}
 						this.starships.push(...response.data.results);
 						this.loading = false;
@@ -129,10 +129,6 @@ export default {
 					console.error(e)
 					this.loading = false;
 				})
-				.finally(()=> {
-
-				})
-
 		},
 		clickBookmarkShip(ship, index) {
 
@@ -182,7 +178,6 @@ export default {
 		}
 	},
 	mounted() {
-
 		// if available load stored data
 		if (localStorage.getItem(STORAGE_KEY)) {
 			this.starships = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -239,7 +234,7 @@ export default {
 
 <style lang="scss">
 
-@import url('//db.onlinewebfonts.com/c/1daa609fdca8da38e5bcbb12c2a987db?family=DINNextW01-Regular');
+@import url('https://db.onlinewebfonts.com/c/1daa609fdca8da38e5bcbb12c2a987db?family=DINNextW01-Regular');
 
 #app {
 	font-family: 'DINNextW01-Regular', Helvetica, Arial, sans-serif;

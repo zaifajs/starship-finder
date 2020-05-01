@@ -14,9 +14,9 @@
 			</div>
 
 			<div class="filter-bar">
-				<div :class="['bookmarked', openBookmarkedData ? 'active': null]" @click.stop.prevent="filterBookmarked">
+				<div :class="['bookmarked', openBookmarkedData ? 'active': 'no-items']" @click.stop.prevent="filterBookmarked">
 					<span class="star"> </span>
-					<span v-if="bookmarkedLength > 0" class="item-count">
+					<span v-if="bookmarkedLength >= 0" class="item-count">
 						{{ bookmarkedLength }}
 					</span>
 				</div>
@@ -37,6 +37,10 @@
 						{{ tag }}
 					</span>
 				</span>
+			</div>
+
+			<div style="text-align:right">
+				<strong>Total results: {{ filteredShips.length }}</strong>
 			</div>
 
 			<!-- starships all item -->
@@ -80,9 +84,11 @@
 <script>
 import Vue from 'vue'
 import axios from 'axios';
+import VueAxios from 'vue-axios';
 import TagSelector from 'vue-tag-selector';
 import CoListItem from './components/CoListItem.vue';
 import CoSearchInput from './components/CoSearchInput.vue';
+Vue.use(VueAxios, axios);
 
 const STORAGE_KEY = 'bookmark-storage'
 
@@ -95,7 +101,7 @@ export default {
 	},
 	data() {
 		return {
-			url: 'https://swapi.co/api/starships/?format=json',
+			url: 'https://swapi.dev/api/starships/?format=json',
 			starships: [],
 			bookmarkedData: [],
 			taggedData: [],
@@ -107,17 +113,26 @@ export default {
 		}
 	},
 	methods: {
-		loadStarships() {
+		loadStarships(apiUrl) {
 			this.loading = true;
-			axios.get(this.url)
+			Vue.axios.get(apiUrl)
 				.then((response) => {
-					this.starships =  response.data.results
-					this.loading = false;
+					if (response.data.next || response.data.previous) {
+						if (response.data.next !== null) {
+							this.loadStarships(response.data.next);
+						}
+						this.starships.push(...response.data.results);
+						this.loading = false;
+					}
 				})
 				.catch(e=> {
 					console.error(e)
 					this.loading = false;
 				})
+				.finally(()=> {
+
+				})
+
 		},
 		clickBookmarkShip(ship, index) {
 
@@ -167,11 +182,12 @@ export default {
 		}
 	},
 	mounted() {
+
 		// if available load stored data
 		if (localStorage.getItem(STORAGE_KEY)) {
-			this.starships = JSON.parse(localStorage.getItem(STORAGE_KEY))
+			this.starships = JSON.parse(localStorage.getItem(STORAGE_KEY));
 		} else {
-			this.loadStarships();
+			this.loadStarships(this.url)
 		}
 	},
 	computed: {
@@ -279,6 +295,9 @@ export default {
 				.star {
 					background-color: $color-black;
 				}
+			}
+			&.no-items {
+				cursor: no-drop;
 			}
 			.item-count {
 				position: absolute;

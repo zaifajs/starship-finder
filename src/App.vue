@@ -14,7 +14,9 @@
 			</div>
 
 			<div class="filter-bar">
-				<div :class="['bookmarked', openBookmarkedData ? 'active': 'no-items']" @click.stop.prevent="filterBookmarked">
+				<div :class="['bookmarked', openBookmarkedData ? 'active': 'no-items']"
+					@click.stop.prevent="filterBookmarked"
+				>
 					<span class="star"> </span>
 					<span v-if="bookmarkedLength >= 0" class="item-count">
 						{{ bookmarkedLength }}
@@ -44,11 +46,14 @@
 			</div>
 
 			<!-- starships all item -->
-			<div class="list-wrapper">
-
-				<span v-if="openBookmarkedData && noResults" class="no-result no-bookmarked-item">
-					No results were found matching: {{ searchQuery }}
+			<div class="list-wrapper no-results">
+				<span v-if="bookmarkedLength === 0 && openBookmarkedData">
+					No bookmarked item found!
 				</span>
+				<span v-if="filteredShips.length === 0 && searchQuery.length > 0">
+					No results were found matching: <span style="font-weight: 100"> <i>{{ searchQuery }}</i></span>
+				</span>
+			</div>
 
 				<CoListItem
 					v-for="(starship, starshipIndex) in filteredShips"
@@ -71,14 +76,13 @@
 
 					<div slot="tag" class="tag-panel theme-material">
 						<label for="tags">Post tags:</label>
-						<tag-selector name="tags" @input="tagInput" v-model="starship.tags" placeholder="tags"/>
+						<tag-selector :name="`tags${starshipIndex}`" @input="tagInput" v-model="starship.tags" placeholder="tags"/>
 					</div>
 
 				</CoListItem>
 			</div>
 
 		</div>
-	</div>
 </template>
 
 <script>
@@ -109,7 +113,7 @@ export default {
 			openBookmarkedData: false,
 			openTaggedData: false,
 			loading: false,
-			tagsList: []
+			tagsList: {}
 		}
 	},
 	methods: {
@@ -119,7 +123,8 @@ export default {
 				.then((response) => {
 					if (response.data.next || response.data.previous) {
 						if (response.data.next !== null) {
-							this.loadStarships(response.data.next.replace(/^http:\/\//i, 'https://'));
+							const urlSecure = response.data.next.replace(/^http:\/\//i, 'https://')
+							this.loadStarships(urlSecure);
 						}
 						this.starships.push(...response.data.results);
 						this.loading = false;
@@ -171,7 +176,6 @@ export default {
 		},
 		filterBookmarked() {
 			this.openBookmarkedData = !this.openBookmarkedData;
-
 			if (this.openBookmarkedData) {
 				this.bookmarkedData = this.starships.filter(item => item.isMarked)
 			}
@@ -204,8 +208,8 @@ export default {
 			} else if (this.openBookmarkedData) {
 				return this.bookmarkedData;
 			} else if (this.openTaggedData) {
-				return this.taggedData;
-			} else  {
+					return this.taggedData;
+			} else {
 				return searchResults;
 			}
 			/* cache: false,
@@ -217,9 +221,6 @@ export default {
 			set: function (newValue) {
 				return this.starships = newValue
 			} */
-		},
-		noResults() {
-			if (this.searchQuery.length > 1 || this.bookmarkedData.length === 0) { return true;} else { return false; }
 		},
 		// get bookmarked items lenght
 		bookmarkedLength() {
@@ -291,9 +292,6 @@ export default {
 					background-color: $color-black;
 				}
 			}
-			&.no-items {
-				cursor: no-drop;
-			}
 			.item-count {
 				position: absolute;
 				background-color: #CE0100;
@@ -332,7 +330,7 @@ export default {
 		}
 	}
 
-	.no-bookmarked-item {
+	.no-results {
 		display: flex;
 		justify-content: center;
 		padding: 30px 0;
